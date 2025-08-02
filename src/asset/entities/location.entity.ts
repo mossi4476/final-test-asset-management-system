@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from 'typeorm';
 
 @Entity()
 export class Location {
@@ -12,11 +12,14 @@ export class Location {
   location_name: string;
 
   @Column()
-  organization: string;
-
-  @Column()
   status: string;
+
+  @ManyToOne('Organization', 'locations', { onDelete: 'CASCADE' })
+  organization: any;
 
   @OneToMany('Asset', 'location')
   assets: any[];
+
+  @OneToMany('Device', 'location')
+  devices: any[];
 }

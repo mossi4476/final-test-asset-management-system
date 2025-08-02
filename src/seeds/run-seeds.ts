@@ -1,5 +1,7 @@
 import { DataSource } from 'typeorm';
+import { seedOrganizations } from './organization.seed';
 import { seedLocations } from './location.seed';
+import { seedDevices } from './device.seed';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -20,8 +22,17 @@ async function runSeeds() {
     await dataSource.initialize();
     console.log('Database connected successfully');
 
+    // Run organization seeds first
+    console.log('Seeding organizations...');
+    await seedOrganizations(dataSource);
+    
     // Run location seeds
+    console.log('Seeding locations...');
     await seedLocations(dataSource);
+    
+    // Run device seeds
+    console.log('Seeding devices...');
+    await seedDevices(dataSource);
     
     console.log('All seeds completed successfully');
   } catch (error) {
