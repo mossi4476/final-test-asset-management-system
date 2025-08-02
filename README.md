@@ -1,98 +1,224 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Asset Sync Service
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Microservice để đồng bộ tài sản từ BR Company API vào hệ thống quản lý tài sản.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🎯 Mục tiêu
 
-## Description
+- Đồng bộ tự động assets từ API `https://669ce22d15704bb0e304842d.mockapi.io/assets`
+- Quản lý dữ liệu Organization, Location, Device, Asset
+- Chạy cronjob định kỳ để cập nhật dữ liệu
+- Cung cấp API endpoints để quản lý thủ công
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 🏗️ Kiến trúc
 
-## Project setup
-
-```bash
-$ npm install
+### Entities
+```
+Organization (1) → (N) Location
+Location (1) → (N) Device
+Location (1) → (N) Asset
 ```
 
-## Compile and run the project
+### Technology Stack
+- **Framework**: NestJS
+- **Database**: MySQL với TypeORM
+- **HTTP Client**: Axios
+- **Scheduling**: @nestjs/schedule
+- **Configuration**: @nestjs/config
 
+## 🚀 Quick Start
+
+### 1. Cài đặt dependencies
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Run tests
+### 2. Cấu hình environment
+Tạo file `.env`:
+```env
+# Database
+DATABASE_HOST=localhost
+DATABASE_PORT=3306
+DATABASE_USER=root
+DATABASE_PASS=
+DATABASE_NAME=asset_management
 
-```bash
-# unit tests
-$ npm run test
+# API Configuration
+ASSET_API_URL=https://669ce22d15704bb0e304842d.mockapi.io/assets
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+# Cron (optional)
+CRON_EXPRESSION=*/5 * * * *
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
+### 3. Setup database
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# Build project
+npm run build
+
+# Run migrations
+npx typeorm migration:run -d migration-runner.js
+
+# Seed data
+npm run seed
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### 4. Khởi động service
+```bash
+# Development
+npm run start:dev
 
-## Resources
+# Production
+npm run start:prod
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+## 📊 API Endpoints
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/assets/health` | Health check |
+| POST | `/assets/sync` | Manual asset sync |
 
-## Support
+### Examples
+```bash
+# Health check
+curl http://localhost:3000/assets/health
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+# Manual sync
+curl -X POST http://localhost:3000/assets/sync
+```
 
-## Stay in touch
+## ⏰ Cronjob
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Service tự động đồng bộ assets mỗi 5 phút:
+- **Schedule**: `*/5 * * * *`
+- **Configurable**: Thông qua `CRON_EXPRESSION`
+- **Logging**: Chi tiết quá trình đồng bộ
 
-## License
+## 🗄️ Database
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### Migrations
+- `1754106761912-CreateTables.ts` - Tạo bảng Asset, Location
+- `1754107000000-AddDeviceTable.ts` - Thêm bảng Device
+- `1754107100000-AddOrganizationTable.ts` - Thêm bảng Organization
+
+### Seed Data
+- **2 Organizations**: PNS, PLJ
+- **5 Locations**: Da Nang, Ha Noi, Ho Chi Minh, Nha Trang, Can Tho
+- **15 Devices**: Laptops, Desktops, Printers, Monitors, Network equipment
+
+## 🔄 Sync Process
+
+1. **API Call**: Gọi BR Company API
+2. **Filter**: Lọc assets active và createdAt < now
+3. **Validate**: Kiểm tra location_id tồn tại
+4. **Check Duplicate**: Tránh trùng lặp
+5. **Insert**: Lưu vào database với transaction
+6. **Log**: Ghi log chi tiết
+
+## 📋 Logging
+
+```
+[AssetService] Bắt đầu đồng bộ assets từ API: https://...
+[AssetService] Nhận được 10 assets từ API
+[AssetService] Có 8 assets cần đồng bộ
+[AssetService] Đã đồng bộ asset: Laptop Dell (LAP001) tại Da Nang
+[AssetService] Đồng bộ thành công! Đã đồng bộ 8 assets, bỏ qua 2 assets.
+```
+
+## 🛠️ Development
+
+### Scripts
+```bash
+npm run build          # Build project
+npm run start:dev      # Development server
+npm run start:prod     # Production server
+npm run test           # Run tests
+npm run test:e2e       # E2E tests
+npm run seed           # Seed data
+npm run lint           # Lint code
+npm run format         # Format code
+```
+
+### Project Structure
+```
+src/
+├── asset/
+│   ├── entities/          # Database entities
+│   ├── dto/              # Data transfer objects
+│   ├── seeds/            # Seed data
+│   ├── asset.service.ts  # Business logic
+│   ├── asset.controller.ts # API endpoints
+│   ├── asset.cron.ts     # Scheduled tasks
+│   └── asset.module.ts   # Module configuration
+├── config/
+│   └── database.config.ts # Database config
+├── migrations/           # Database migrations
+├── app.module.ts         # Root module
+└── main.ts              # Application entry
+```
+
+## 🔧 Configuration
+
+### Environment Variables
+| Variable | Default | Description |
+|----------|---------|-------------|
+| DATABASE_HOST | localhost | MySQL host |
+| DATABASE_PORT | 3306 | MySQL port |
+| DATABASE_USER | root | MySQL username |
+| DATABASE_PASS | | MySQL password |
+| DATABASE_NAME | asset_management | Database name |
+| ASSET_API_URL | https://669ce22d15704bb0e304842d.mockapi.io/assets | BR Company API |
+| CRON_EXPRESSION | */5 * * * * | Cron schedule |
+
+## 🐛 Troubleshooting
+
+### Lỗi kết nối database
+```bash
+# Kiểm tra MySQL service
+sudo service mysql status
+
+# Kiểm tra connection
+mysql -u root -p -h localhost
+```
+
+### Lỗi migration
+```bash
+# Build trước khi migrate
+npm run build
+
+# Chạy migration
+npx typeorm migration:run -d migration-runner.js
+```
+
+### Lỗi cronjob
+```bash
+# Test thủ công
+curl -X POST http://localhost:3000/assets/sync
+
+# Kiểm tra log
+tail -f logs/application.log
+```
+
+## 📈 Monitoring
+
+### Health Check
+```bash
+curl http://localhost:3000/assets/health
+# Response: {"status": "Asset service is running"}
+```
+
+### Manual Sync
+```bash
+curl -X POST http://localhost:3000/assets/sync
+# Response: {"message": "Asset sync completed"}
+```
+
+## 🔒 Security
+
+- Sử dụng environment variables cho sensitive data
+- Database connection với credentials
+- API endpoints với proper validation
+- Transaction management cho data integrity
+
+## 📄 License
+
+UNLICENSED - Private project
