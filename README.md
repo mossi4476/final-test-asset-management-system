@@ -186,7 +186,7 @@ mysql -u root -p -h localhost
 npm run build
 
 # Chạy migration
-npx typeorm migration:run -d migration-runner.js
+npx typeorm migration:run -d src/config/database.config.ts 
 ```
 
 ### Lỗi cronjob
