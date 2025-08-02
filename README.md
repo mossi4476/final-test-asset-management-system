@@ -55,7 +55,7 @@ CRON_EXPRESSION=*/5 * * * *
 npm run build
 
 # Run migrations
-npx typeorm migration:run -d migration-runner.js
+npx typeorm migration:run -d src/config/database.config.ts
 
 # Seed data
 npm run seed
