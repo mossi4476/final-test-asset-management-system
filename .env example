@@ -5,4 +5,4 @@ DATABASE_PASS=123456
 DATABASE_NAME=assetdb
 
 ASSET_API_URL=https://669ce22d15704bb0e304842d.mockapi.io/assets
-CRON_EXPRESSION=* * * * * # Test mỗi phút, khi deploy thật thì để 0 0 * * *
+CRON_EXPRESSION=* * * * * # Test mỗi phút, khi deploy thật thì để 0 0 * * * , (mỗi ngày 1 lần) → dùng '0 0 * * *' (0h00 mỗi ngày).
