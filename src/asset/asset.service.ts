@@ -21,16 +21,14 @@ export class AssetService {
   ) {}
 
   async syncAssets() {
-    const apiUrl = this.configService.get<string>('ASSET_API_URL');
-    if (!apiUrl) {
-      this.logger.error('ASSET_API_URL không được cấu hình');
-      return;
-    }
+    const apiUrl = this.configService.get<string>('ASSET_API_URL') || 'https://669ce22d15704bb0e304842d.mockapi.io/assets';
     this.logger.log(`Bắt đầu đồng bộ assets từ API: ${apiUrl}`);
 
     try {
       const response = await firstValueFrom(this.httpService.get<AssetDto[]>(apiUrl));
       const data = response.data;
+
+      this.logger.log(`Nhận được ${data.length} assets từ API`);
 
       const now = new Date();
       const filteredAssets = data.filter(
@@ -38,6 +36,8 @@ export class AssetService {
           item.status === 'active' &&
           new Date(item.createdAt) < now
       );
+
+      this.logger.log(`Có ${filteredAssets.length} assets cần đồng bộ`);
 
       if (filteredAssets.length === 0) {
         this.logger.log('Không có asset nào cần đồng bộ.');
@@ -48,6 +48,9 @@ export class AssetService {
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
+      let syncedCount = 0;
+      let skippedCount = 0;
+
       try {
         for (const asset of filteredAssets) {
           const location = await this.locationRepo.findOne({
@@ -55,13 +58,15 @@ export class AssetService {
           });
 
           if (!location) {
-            this.logger.warn(`Bỏ qua asset ${asset.id} vì location không tồn tại.`);
+            this.logger.warn(`Bỏ qua asset ${asset.id} vì location_id ${asset.location_id} không tồn tại.`);
+            skippedCount++;
             continue;
           }
 
           const exists = await this.assetRepo.findOne({ where: { asset_id: asset.id } });
           if (exists) {
             this.logger.debug(`Asset ${asset.id} đã tồn tại, bỏ qua.`);
+            skippedCount++;
             continue;
           }
 
@@ -74,10 +79,12 @@ export class AssetService {
           });
 
           await queryRunner.manager.save(newAsset);
+          syncedCount++;
+          this.logger.log(`Đã đồng bộ asset: ${asset.name} (${asset.id}) tại ${location.location_name}`);
         }
 
         await queryRunner.commitTransaction();
-        this.logger.log('Đồng bộ thành công!');
+        this.logger.log(`Đồng bộ thành công! Đã đồng bộ ${syncedCount} assets, bỏ qua ${skippedCount} assets.`);
       } catch (err) {
         await queryRunner.rollbackTransaction();
         this.logger.error('Lỗi khi đồng bộ, rollback...', err);

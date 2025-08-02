@@ -3,6 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AssetModule } from './asset/asset.module';
+import { Asset } from './asset/entities/asset.entity';
+import { Location } from './asset/entities/location.entity';
+import { Device } from './asset/entities/device.entity';
+import { Organization } from './asset/entities/organization.entity';
 
 @Module({
   imports: [
@@ -18,7 +22,7 @@ import { AssetModule } from './asset/asset.module';
         username: configService.get<string>('DATABASE_USER'),
         password: configService.get<string>('DATABASE_PASS'),
         database: configService.get<string>('DATABASE_NAME'),
-        autoLoadEntities: true,
+        entities: [Asset, Location, Device, Organization],
         synchronize: false, // không bật sync, dùng migration hoặc tạo bảng tay
       }),
     }),
