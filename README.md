@@ -55,7 +55,8 @@ CRON_EXPRESSION=*/5 * * * *
 npm run build
 
 # Run migrations
-npx typeorm migration:run -d src/config/database.config.ts
+npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d src/config/database.config.ts
+
 
 # Seed data
 npm run seed
@@ -186,7 +187,8 @@ mysql -u root -p -h localhost
 npm run build
 
 # Chạy migration
-npx typeorm migration:run -d src/config/database.config.ts 
+npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d src/config/database.config.ts
+
 ```
 
 ### Lỗi cronjob
