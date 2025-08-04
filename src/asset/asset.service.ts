@@ -33,8 +33,8 @@ export class AssetService {
       const now = new Date();
       const filteredAssets = data.filter(
         (item) =>
-          item.status === 'active' &&
-          new Date(item.createdAt) < now
+          item.status === 'actived' &&
+          new Date(item.created_at * 1000) < now
       );
 
       this.logger.log(`Có ${filteredAssets.length} assets cần đồng bộ`);
@@ -72,15 +72,15 @@ export class AssetService {
 
           const newAsset = this.assetRepo.create({
             asset_id: asset.id,
-            name: asset.name,
+            name: `${asset.type} - ${asset.serial}`,
             status: asset.status,
             location: location as any,
-            createdAt: new Date(asset.createdAt),
+            createdAt: new Date(asset.created_at * 1000),
           });
 
           await queryRunner.manager.save(newAsset);
           syncedCount++;
-          this.logger.log(`Đã đồng bộ asset: ${asset.name} (${asset.id}) tại ${location.location_name}`);
+          this.logger.log(`Đã đồng bộ asset: ${asset.type} - ${asset.serial} (${asset.id}) tại ${location.location_name}`);
         }
 
         await queryRunner.commitTransaction();
